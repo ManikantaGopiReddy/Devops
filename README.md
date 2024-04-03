@@ -35,10 +35,10 @@ Feedback and contributions are appreciated! If you encounter any concerns or hav
 
 <h2>Results:</h2>
 Revise the content with equivalent meaning without altering any technical terminology.
+**<h2>Results:</h2>**
 ![Example Image](dev.png)
 ![Example Image](qa.png)
 ![Example Image](prepod.png)
 ![Example Image](prod.png)
 ![Example Image](deploy.png)
-
 
