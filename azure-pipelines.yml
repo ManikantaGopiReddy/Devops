@@ -1,0 +1,73 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - dev/**
+      - qa/**
+      - PreProd/**
+      - Prod/**
+
+variables:
+  CLIENT_ID: "5ceda05f-0cda-458a-a27e-20638bf3b2bb"
+  CLIENT_SECRET: "BLq8Q~L6PYRAhIIFQEWDH8lm5q9g1_LLHYZ-jbW4"
+  SUBSCRIPTION_ID: "197f555f-0e87-4269-81e6-45c49d40c8fe"
+  TENANT_ID: "f6dc5d4f-2547-482b-a649-60188e90904d"
+
+stages:
+  - stage: Dev
+    jobs:
+      - job: Deploy_to_Dev
+        displayName: 'Deploy in dev'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - script: |
+              az login --service-principal -u $(CLIENT_ID) -p $(CLIENT_SECRET) --tenant $(TENANT_ID)
+              curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+              sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+              sudo apt-get update && sudo apt-get install terraform -y
+              cd dev
+              terraform init
+              terraform plan -out=tfplan
+              terraform apply -auto-approve tfplan
+          
+  - stage: qa
+    jobs:
+      - job: Deploy_to_qa
+        displayName: 'Deploy in qa'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - script: |
+              cd qa
+              terraform init
+              terraform plan -out=tfplan
+              terraform apply -auto-approve tfplan
+  - stage: preprod
+    jobs:
+      - job: Deploy_to_preprod
+        displayName: 'Deploy in preprod'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - script: |
+              cd preprod
+              terraform init
+              terraform plan -out=tfplan
+              terraform apply -auto-approve tfplan
+  - stage: prod
+    jobs:
+      - job: Deploy_to_prod
+        displayName: 'Deploy in prod'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - script: |
+              cd prod
+              terraform init
+              terraform plan -out=tfplan
+              terraform apply -auto-approve tfplan
+        
+
